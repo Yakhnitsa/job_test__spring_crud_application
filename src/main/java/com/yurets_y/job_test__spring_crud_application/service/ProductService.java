@@ -5,6 +5,7 @@ import com.yurets_y.job_test__spring_crud_application.entity.Product;
 import com.yurets_y.job_test__spring_crud_application.repository.ProductRepo;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -25,6 +26,7 @@ public class ProductService {
 
 
     public int getProductCountById(Long productId){
-       return productRepo.getProductCountById(productId);
+        return productRepo.existsById(productId) ?
+                productRepo.getOne(productId).getCount() : 0;
     }
 }

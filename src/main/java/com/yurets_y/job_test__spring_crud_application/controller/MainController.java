@@ -39,8 +39,8 @@ public class MainController {
             @RequestParam(required = false) String other
     ){
 
-
-        return ResponseEntity.ok("All is done");
+        int productCount = productService.getProductCountById(id);
+        return ResponseEntity.ok(productCount);
     }
 
     @PostMapping("/test")
