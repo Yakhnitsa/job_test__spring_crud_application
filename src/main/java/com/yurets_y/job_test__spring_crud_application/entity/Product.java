@@ -40,6 +40,10 @@ public class Product {
         return count;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public void setCount(Integer count) {
         this.count = count;
     }
