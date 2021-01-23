@@ -23,7 +23,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("User with such name is already exists");
         }
 
-        UserAccount newUser = new UserAccount();
+        UserAccount newUser = new UserAccount(userName);
         newUser = userService.saveUserAccount(newUser);
         return ResponseEntity.ok(newUser);
     }
@@ -37,7 +37,7 @@ public class UserController {
         if(moneyAmount < 0){
             return ResponseEntity.badRequest().body("refill sum must be positive number");
         }
-        if(userFromDb.getUserName().equals(userName)){
+        if(!userFromDb.getUserName().equals(userName)){
             return ResponseEntity.badRequest().body("User id don't match user name");
         }
 
