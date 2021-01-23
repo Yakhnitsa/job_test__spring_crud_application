@@ -5,6 +5,7 @@ import com.yurets_y.job_test__spring_crud_application.dto.IdCountDto;
 import com.yurets_y.job_test__spring_crud_application.entity.Product;
 import com.yurets_y.job_test__spring_crud_application.entity.UserAccount;
 import com.yurets_y.job_test__spring_crud_application.service.ProductService;
+import com.yurets_y.job_test__spring_crud_application.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,11 @@ public class StoreController {
 
     private ProductService productService;
 
-    public StoreController(ProductService productService) {
+    private UserService userService;
+
+    public StoreController(ProductService productService, UserService userService) {
         this.productService = productService;
+        this.userService = userService;
     }
 
     @GetMapping("/list")
@@ -38,6 +42,19 @@ public class StoreController {
                 .collect(Collectors.toMap(IdCountDto::getId,IdCountDto::getCount));
 
         List<Product> products = productService.findByIdList(idAndCountMap.keySet());
+
+        Map<Product,Integer> productsNCountMap = new HashMap<>();
+        products.forEach(product -> {
+            productsNCountMap.put(product,idAndCountMap.get(product.getId()));
+        });
+        Long moneyRequired = productService.getProductsTotalPrice(productsNCountMap);
+        if(moneyRequired > userAccount.getMoneyAmount()){
+            String message = notEnoughMoneyMessage(userAccount.getMoneyAmount(),moneyRequired);
+            return ResponseEntity.status(402).body(message);
+        }
+
+
+
         /*
             TODO - Проверить наличие товаров в нужном количестве
             - Свести сумму всех товаров
@@ -50,5 +67,12 @@ public class StoreController {
          */
 
         return ResponseEntity.ok("All is done");
+    }
+
+    private String notEnoughMoneyMessage(Long moneyHas,Long moneyRequires){
+        return String.format("Not enough money on account: \n" +
+                        "money on account: %.2f, required amount: %.2f",
+                (float)moneyHas/100,
+                (float)moneyRequires/100);
     }
 }
