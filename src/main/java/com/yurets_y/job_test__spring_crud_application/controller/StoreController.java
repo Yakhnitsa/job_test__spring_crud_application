@@ -5,6 +5,7 @@ import com.yurets_y.job_test__spring_crud_application.dto.IdCountDto;
 import com.yurets_y.job_test__spring_crud_application.entity.Discount;
 import com.yurets_y.job_test__spring_crud_application.entity.Product;
 import com.yurets_y.job_test__spring_crud_application.entity.UserAccount;
+import com.yurets_y.job_test__spring_crud_application.service.DiscountService;
 import com.yurets_y.job_test__spring_crud_application.service.ProductService;
 import com.yurets_y.job_test__spring_crud_application.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,14 @@ public class StoreController {
 
     private UserService userService;
 
-    public StoreController(ProductService productService, UserService userService) {
+    private DiscountService discountService;
+
+    public StoreController(ProductService productService,
+                           UserService userService,
+                           DiscountService discountService) {
         this.productService = productService;
         this.userService = userService;
+        this.discountService = discountService;
     }
 
     @GetMapping("/list")
@@ -45,15 +51,14 @@ public class StoreController {
 
     @PutMapping("update_product")
     public ResponseEntity<?> updateProduct(
-            @RequestParam("id") Product prodFromDb,
+            @RequestParam Long id,
             @RequestBody Product product
     ) {
-//        if (prodFromDb == null) {
-//            return ResponseEntity.badRequest().body("No record with such id");
-//        }
-//        if(prodFromDb.getId().equals(product.getId())){
-//            return  ResponseEntity.badRequest().body("Product id do not match request parameter id");
-//        }
+
+        if(productService.existsById(id)){
+            return ResponseEntity.badRequest().body("product id not found");
+        }
+        Product prodFromDb = productService.getById(id);
 
         prodFromDb.setName(product.getName());
         prodFromDb.setPrice(product.getPrice());
@@ -67,21 +72,24 @@ public class StoreController {
     @DeleteMapping("delete_product")
     public ResponseEntity<?> deleteProduct(
             @RequestParam Long id
-    ){
-        if(productService.existsById(id)){
+    ) {
+        if (productService.existsById(id)) {
             productService.deleteProductById(id);
             return ResponseEntity.ok(id);
         }
         return ResponseEntity.notFound().build();
     }
 
-    //TODO not tested yet
     @PostMapping("/pay")
     @ResponseBody
     public ResponseEntity testPost(
-            @RequestParam(required = false, name = "id") UserAccount userAccount,
-            @RequestBody(required = false) List<IdCountDto> dtoList
+            @RequestParam Long id,
+            @RequestBody List<IdCountDto> dtoList
     ) {
+        if (!userService.containUser(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        UserAccount userAccount = userService.getUserAccountById(id);
 
         Map<Long, Integer> idAndCountMap = dtoList.stream()
                 .collect(Collectors.toMap(IdCountDto::getId, IdCountDto::getCount));
@@ -93,11 +101,11 @@ public class StoreController {
             productsNCountMap.put(product, idAndCountMap.get(product.getId()));
         });
 
-        if (!isProductsEnough(productsNCountMap)){
+        if (!isProductsEnough(productsNCountMap)) {
             return ResponseEntity.badRequest().body("Not enough count of products in store");
         }
 
-            //Проверка на наличие необходимой суммы денег
+        //Проверка на наличие необходимой суммы денег
         Long moneyRequired = getProductsTotalPrice(productsNCountMap);
 
         if (moneyRequired > userAccount.getMoneyAmount()) {
@@ -109,29 +117,23 @@ public class StoreController {
         userAccount.setMoneyAmount(userAccount.getMoneyAmount() - moneyRequired);
         userService.saveUserAccount(userAccount);
 
-        /*
-            TODO - Проверить наличие товаров в нужном количестве
-            + Свести сумму всех товаров
-            + Проверить наличие необходимого количества средств на счету, и вернуть сколько не хватает
-            + Провести операцию покупки товаров, сохранить операцию
-            + Снять деньги со счета покупателя
-            + Сохранить пользователя после транзакции
-            + Вернуть данные про купленные товары в ответе
-            - Протестировать всю єту хрень!!!
-
-         */
-
         return ResponseEntity.ok(productsNCountMap);
     }
 
     @PostMapping("add_product_discount")
     public ResponseEntity<?> addDiscount(
-            @RequestParam("product_id") Product product,
-            @RequestParam("discount_id") Discount discount
+            @RequestParam("product_id") Long productId,
+            @RequestParam("discount_id") Long discountId
     ) {
-        if (product == null && discount == null) {
-            return ResponseEntity.badRequest().body("Product id or discount id haven't found in database");
+        if(!productService.existsById(productId)){
+            return ResponseEntity.badRequest().body("product id not found");
         }
+        if(!discountService.existsById(discountId)){
+            return ResponseEntity.badRequest().body("discount id not found");
+        }
+        Product product = productService.getById(productId);
+        Discount discount = discountService.getById(discountId);
+
         product.setDiscount(discount);
         product = productService.saveProduct(product);
         return ResponseEntity.ok(product);
@@ -158,7 +160,7 @@ public class StoreController {
     private Boolean isProductsEnough(Map<Product, Integer> productsMap) {
 
         for (Map.Entry<Product, Integer> entry : productsMap.entrySet()) {
-            if(entry.getKey().getCount() < entry.getValue())
+            if (entry.getKey().getCount() < entry.getValue())
                 return false;
         }
         return true;
