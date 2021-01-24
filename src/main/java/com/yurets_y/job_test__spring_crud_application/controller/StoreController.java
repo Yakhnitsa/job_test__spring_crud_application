@@ -88,26 +88,29 @@ public class StoreController {
 
             //Проверка на наличие необходимой суммы денег
         Long moneyRequired = getProductsTotalPrice(productsNCountMap);
+
         if (moneyRequired > userAccount.getMoneyAmount()) {
             String message = notEnoughMoneyMessage(userAccount.getMoneyAmount(), moneyRequired);
             return ResponseEntity.status(402).body(message);
         }
-
-
-
+        // Проведение транзакции
+        productService.buyProducts(idAndCountMap);
+        userAccount.setMoneyAmount(userAccount.getMoneyAmount() - moneyRequired);
+        userService.saveUserAccount(userAccount);
 
         /*
             TODO - Проверить наличие товаров в нужном количестве
-            - Свести сумму всех товаров
-            - Проверить наличие необходимого количества средств на счету, и вернуть сколько не хватает
-            - Провести операцию покупки товаров, сохранить операцию
-            - Снять деньги со счета покупателя
-            - Сохранить пользователя после транзакции
-            - Вернуть данные про купленные товары в ответе
+            + Свести сумму всех товаров
+            + Проверить наличие необходимого количества средств на счету, и вернуть сколько не хватает
+            + Провести операцию покупки товаров, сохранить операцию
+            + Снять деньги со счета покупателя
+            + Сохранить пользователя после транзакции
+            + Вернуть данные про купленные товары в ответе
+            - Протестировать всю єту хрень!!!
 
          */
 
-        return ResponseEntity.ok("All is done");
+        return ResponseEntity.ok(productsNCountMap);
     }
 
     @PostMapping
