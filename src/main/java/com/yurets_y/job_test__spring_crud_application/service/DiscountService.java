@@ -11,8 +11,16 @@ public class DiscountService {
 
     private DiscountRepo discountRepo;
 
+    public DiscountService(DiscountRepo discountRepo) {
+        this.discountRepo = discountRepo;
+    }
+
     public List<Discount> getAll(){
         return discountRepo.findAll();
+    }
+
+    public Boolean existsById(Long id){
+        return discountRepo.existsById(id);
     }
 
     public Discount getById(Long id){
