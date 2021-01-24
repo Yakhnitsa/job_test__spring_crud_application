@@ -5,6 +5,8 @@ import com.yurets_y.job_test__spring_crud_application.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -28,5 +30,9 @@ public class UserService {
 
     public boolean userNameExists(String userName) {
         return userRepo.existsByUserName(userName);
+    }
+
+    public List<UserAccount> getAll() {
+        return userRepo.findAll();
     }
 }

@@ -44,14 +44,11 @@ public class ProductService {
         return productRepo.saveAll(products);
     }
 
-    public Long getProductsTotalPrice(Map<Product, Integer> productsAndCount) {
-        return productsAndCount.entrySet().stream()
-                .map(entry -> {
-                    Product product = entry.getKey();
-                    int priceWithDiscount = product.getDiscount() == null ?
-                            product.getPrice() : product.getPrice() * product.getDiscount().getValue() / 100;
-                    return Long.valueOf(priceWithDiscount) * entry.getValue();
-                }).mapToLong(Long::longValue).sum();
-    }
+    public Product saveProduct(Product product) {
+        if(product == null){
+            throw new NullPointerException("Exception while saving product, product must not me null");
+        }
+        return productRepo.save(product);
 
+    }
 }

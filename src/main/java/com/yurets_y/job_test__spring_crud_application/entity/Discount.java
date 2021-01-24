@@ -13,15 +13,15 @@ public class Discount {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Integer value;
+    private Float value;
 
     private String name;
 
-    public Integer getValue() {
+    public Float getValue() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(Float value) {
         this.value = value;
     }
 

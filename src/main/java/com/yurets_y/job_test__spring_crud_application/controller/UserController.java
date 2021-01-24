@@ -3,9 +3,12 @@ package com.yurets_y.job_test__spring_crud_application.controller;
 import com.yurets_y.job_test__spring_crud_application.entity.UserAccount;
 import com.yurets_y.job_test__spring_crud_application.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -14,6 +17,11 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping
+    public List<UserAccount> getAllUsers(){
+        return userService.getAll();
     }
 
     @PostMapping("/create_user")
