@@ -35,4 +35,8 @@ public class UserService {
     public List<UserAccount> getAll() {
         return userRepo.findAll();
     }
+
+    public void deleteUser(Long id) {
+        userRepo.deleteById(id);
+    }
 }

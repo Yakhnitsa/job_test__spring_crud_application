@@ -48,23 +48,34 @@ public class StoreController {
             @RequestParam("id") Product prodFromDb,
             @RequestBody Product product
     ) {
-        if (prodFromDb == null) {
-            return ResponseEntity.badRequest().body("No record with such id");
-        }
-        if (!prodFromDb.getId().equals(product.getId())) {
-            return ResponseEntity.badRequest().body("Request parameter \"id\", don't match product id");
-        }
+//        if (prodFromDb == null) {
+//            return ResponseEntity.badRequest().body("No record with such id");
+//        }
+//        if(prodFromDb.getId().equals(product.getId())){
+//            return  ResponseEntity.badRequest().body("Product id do not match request parameter id");
+//        }
 
         prodFromDb.setName(product.getName());
         prodFromDb.setPrice(product.getPrice());
         prodFromDb.setCount(product.getCount());
         prodFromDb.setDiscount(product.getDiscount());
-        prodFromDb = productService.saveProduct(product);
+        prodFromDb = productService.saveProduct(prodFromDb);
 
         return ResponseEntity.ok(prodFromDb);
     }
 
+    @DeleteMapping("delete_product")
+    public ResponseEntity<?> deleteProduct(
+            @RequestParam Long id
+    ){
+        if(productService.existsById(id)){
+            productService.deleteProductById(id);
+            return ResponseEntity.ok(id);
+        }
+        return ResponseEntity.notFound().build();
+    }
 
+    //TODO not tested yet
     @PostMapping("/pay")
     @ResponseBody
     public ResponseEntity testPost(
@@ -113,7 +124,7 @@ public class StoreController {
         return ResponseEntity.ok(productsNCountMap);
     }
 
-    @PostMapping
+    @PostMapping("add_product_discount")
     public ResponseEntity<?> addDiscount(
             @RequestParam("product_id") Product product,
             @RequestParam("discount_id") Discount discount

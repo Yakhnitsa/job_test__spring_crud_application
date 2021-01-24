@@ -25,6 +25,10 @@ public class UserAccount {
         moneyAmount = 0L;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getUserName() {
         return userName;
     }

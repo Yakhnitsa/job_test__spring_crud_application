@@ -51,4 +51,12 @@ public class ProductService {
         return productRepo.save(product);
 
     }
+
+    public boolean existsById(Long id) {
+        return productRepo.existsById(id);
+    }
+
+    public void deleteProductById(Long id) {
+        productRepo.deleteById(id);
+    }
 }
