@@ -25,7 +25,14 @@ public class UserService {
     }
 
     public UserAccount saveUserAccount(UserAccount account){
+//        if(!userIsValid(account)){
+//            throw new RuntimeException("Error while user validation");
+//        }
         return userRepo.saveAndFlush(account);
+    }
+
+    private boolean userIsValid(UserAccount account) {
+        return account.getMoneyAmount() >= 0;
     }
 
     public boolean userNameExists(String userName) {

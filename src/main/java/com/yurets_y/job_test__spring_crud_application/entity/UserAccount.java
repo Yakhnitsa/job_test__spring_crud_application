@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class UserAccount {
@@ -13,8 +15,10 @@ public class UserAccount {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "User name required")
     private String userName;
 
+    @Min(value = 0L, message = "The money amount must be positive")
     private Long moneyAmount;
 
     public UserAccount() {

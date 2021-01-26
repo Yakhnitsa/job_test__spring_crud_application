@@ -9,6 +9,7 @@ import com.yurets_y.job_test__spring_crud_application.service.DiscountService;
 import com.yurets_y.job_test__spring_crud_application.service.ProductService;
 import com.yurets_y.job_test__spring_crud_application.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -82,6 +83,7 @@ public class StoreController {
 
     @PostMapping("/pay")
     @ResponseBody
+    @Transactional(rollbackFor = RuntimeException.class)
     public ResponseEntity testPost(
             @RequestParam Long id,
             @RequestBody List<IdCountDto> dtoList

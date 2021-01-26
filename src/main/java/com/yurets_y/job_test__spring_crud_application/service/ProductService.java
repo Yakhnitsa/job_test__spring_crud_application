@@ -3,6 +3,7 @@ package com.yurets_y.job_test__spring_crud_application.service;
 import com.yurets_y.job_test__spring_crud_application.entity.Product;
 import com.yurets_y.job_test__spring_crud_application.repository.ProductRepo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,12 @@ public class ProductService {
         this.productRepo = productRepo;
     }
 
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         return productRepo.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Product getById(Long productId) {
         return productRepo.getOne(productId);
     }
@@ -28,10 +31,12 @@ public class ProductService {
                 productRepo.getOne(productId).getCount() : 0;
     }
 
+    @Transactional(readOnly = true)
     public List<Product> findByIdList(Iterable<Long> idList) {
         return productRepo.findAllById(idList);
     }
 
+    @Transactional
     public List<Product> buyProducts(Map<Long, Integer> productsAndCount) {
         List<Product> products = findByIdList(productsAndCount.keySet());
         products.forEach(product -> {
@@ -44,6 +49,7 @@ public class ProductService {
         return productRepo.saveAll(products);
     }
 
+    @Transactional
     public Product saveProduct(Product product) {
         if(product == null){
             throw new NullPointerException("Exception while saving product, product must not me null");
@@ -56,6 +62,7 @@ public class ProductService {
         return productRepo.existsById(id);
     }
 
+    @Transactional
     public void deleteProductById(Long id) {
         productRepo.deleteById(id);
     }

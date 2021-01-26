@@ -1,6 +1,8 @@
 package com.yurets_y.job_test__spring_crud_application.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Product {
@@ -9,10 +11,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Product name required")
     private String name;
 
+    @Min(value = 0L, message = "Product price must be positive")
     private Integer price;
 
+    @Min(value = 0L, message = "Product count must be positive")
     private Integer count;
 
     @ManyToOne(fetch = FetchType.EAGER)
